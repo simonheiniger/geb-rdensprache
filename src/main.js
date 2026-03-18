@@ -1,5 +1,6 @@
 import { FilesetResolver, HandLandmarker } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/+esm";
 import { StaticGestureRecognizer } from "./recognizer/StaticGestureRecognizer.js";
+import { DynamicGestureRecognizer } from "./recognizer/DynamicGestureRecognizer.js";
 
 let handLandmarker = undefined;
 let runningMode = "VIDEO";
@@ -14,7 +15,8 @@ const loadingScreen = document.getElementById("loading");
 const gestureOutput = document.getElementById("gesture-output");
 
 // Initialize recognizer architecture
-const recognizer = new StaticGestureRecognizer();
+const staticRecognizer = new StaticGestureRecognizer();
+const dynamicRecognizer = new DynamicGestureRecognizer();
 
 async function createHandLandmarker() {
     try {
@@ -108,13 +110,23 @@ async function predictWebcam() {
                 drawLandmarks(canvasCtx, landmarks, { color: "#3b82f6", lineWidth: 2 });
             }
 
-            // Erkennung durchführen
-            const recognitionResult = recognizer.recognize(results);
+            // Erkennung durchführen (Dynamik hat Vorrang!)
+            const dynamicResult = dynamicRecognizer.recognize(results);
+            let finalResult = null;
+            
+            if (dynamicResult && dynamicResult.text && dynamicResult.text !== "...") {
+                finalResult = dynamicResult;
+            } else {
+                const staticResult = staticRecognizer.recognize(results);
+                if (staticResult && staticResult.text && staticResult.text !== "...") {
+                    finalResult = staticResult;
+                }
+            }
             
             // Textausgabe nur updaten, wenn wirklich etwas Handfestes erkannt wurde
-            if (recognitionResult && recognitionResult.text && recognitionResult.text !== "...") {
-                if (gestureOutput.innerText !== recognitionResult.text) {
-                    gestureOutput.innerText = recognitionResult.text;
+            if (finalResult && finalResult.text && finalResult.text !== "...") {
+                if (gestureOutput.innerText !== finalResult.text) {
+                    gestureOutput.innerText = finalResult.text;
                 }
                 
                 // Debouncing: Halte das letzte erkannte Zeichen mindestens 1.5 Sekunden
