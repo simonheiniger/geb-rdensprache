@@ -22,7 +22,7 @@ const labelList = document.getElementById("label-list");
 // ML Data state
 let isRecording = false;
 let currentCaptureFrames = [];
-const FRAMES_PER_SEQUENCE = 30; // 1 Sekunde bei 30fps
+const FRAMES_PER_SEQUENCE = 60; // 2 Sekunden bei 30fps
 const dataset = []; // Array of { label: string, sequence: number[][] }
 let uniqueLabels = [];
 let trainedModel = null;
@@ -131,7 +131,7 @@ async function predictWebcam() {
             isRecording = false;
             recordBtn.disabled = false;
             recordBtn.classList.remove("is-recording");
-            recordBtn.innerHTML = "<span>🔴 30 Frames aufzeichnen</span>";
+            recordBtn.innerHTML = "<span>🔴 60 Frames aufzeichnen (2 Sek)</span>";
             statusText.innerText = "Aufnahme abgebrochen (Keine Hand im Bild)! Bitte erneut versuchen.";
             currentCaptureFrames = [];
         }
@@ -156,7 +156,7 @@ function finishRecording() {
     // Update UI
     recordBtn.disabled = false;
     recordBtn.classList.remove("is-recording");
-    recordBtn.innerHTML = "<span>🔴 30 Frames aufzeichnen</span>";
+    recordBtn.innerHTML = "<span>🔴 60 Frames aufzeichnen (2 Sek)</span>";
     
     dataCountDisplay.innerText = `${dataset.length} Aufnahmen gesamt (${uniqueLabels.length} Labels)`;
     labelList.innerHTML = uniqueLabels.map(l => `<li>${l} (${dataset.filter(d=>d.label===l).length}x)</li>`).join("");
