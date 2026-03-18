@@ -76,45 +76,55 @@ function enableCam(event) {
     }
 }
 
-async function predictWebcam() {
-    // Interne Render-Auflösung auf echte Pixel des Kamerabildes setzen
-    canvasElement.width = video.videoWidth;
-    canvasElement.height = video.videoHeight;
+let gestureTimeout = null;
 
+async function predictWebcam() {
     if (runningMode === "IMAGE") {
         runningMode = "VIDEO";
         await handLandmarker.setOptions({ runningMode: "VIDEO" });
     }
 
     let startTimeMs = performance.now();
-    let results = undefined;
 
+    // Rendern und Erkennen nur, wenn das Video auch wirklich ein neues Frame hat
     if (lastVideoTime !== video.currentTime) {
         lastVideoTime = video.currentTime;
-        results = handLandmarker.detectForVideo(video, startTimeMs);
-    }
+        
+        canvasElement.width = video.videoWidth;
+        canvasElement.height = video.videoHeight;
+        
+        let results = handLandmarker.detectForVideo(video, startTimeMs);
 
-    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        // Säubere Canvas nur, wenn es auch neue Tracking-Daten gibt
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
-    if (results && results.landmarks && results.landmarks.length > 0) {
-        // Render landmarks
-        for (const landmarks of results.landmarks) {
-            drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {
-                color: "#10b981",
-                lineWidth: 5
-            });
-            drawLandmarks(canvasCtx, landmarks, { color: "#3b82f6", lineWidth: 2 });
+        if (results && results.landmarks && results.landmarks.length > 0) {
+            // Render landmarks
+            for (const landmarks of results.landmarks) {
+                drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {
+                    color: "#10b981",
+                    lineWidth: 5
+                });
+                drawLandmarks(canvasCtx, landmarks, { color: "#3b82f6", lineWidth: 2 });
+            }
+
+            // Erkennung durchführen
+            const recognitionResult = recognizer.recognize(results);
+            
+            // Textausgabe nur updaten, wenn wirklich etwas Handfestes erkannt wurde
+            if (recognitionResult && recognitionResult.text && recognitionResult.text !== "...") {
+                if (gestureOutput.innerText !== recognitionResult.text) {
+                    gestureOutput.innerText = recognitionResult.text;
+                }
+                
+                // Debouncing: Halte das letzte erkannte Zeichen mindestens 1.5 Sekunden
+                // bevor der Text wieder auf "Bereit..." springt, um Flackern zu verhindern.
+                if (gestureTimeout) clearTimeout(gestureTimeout);
+                gestureTimeout = setTimeout(() => {
+                    gestureOutput.innerText = "Bereit...";
+                }, 1500);
+            }
         }
-
-        // Pass landmarks to recognizer architecture
-        const recognitionResult = recognizer.recognize(results);
-        if (recognitionResult && recognitionResult.text) {
-            gestureOutput.innerText = recognitionResult.text;
-        } else {
-            gestureOutput.innerText = "...";
-        }
-    } else {
-        gestureOutput.innerText = "...";
     }
 
     if (webcamRunning === true) {
