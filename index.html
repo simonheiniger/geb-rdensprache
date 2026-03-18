@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSGS Übersetzer</title>
+    <link rel="stylesheet" href="src/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>DSGS Übersetzer</h1>
+            <p>Deutschschweizerische Gebärdensprache in Echtzeit</p>
+        </header>
+        
+        <main>
+            <div class="video-container">
+                <video id="webcam" autoplay playsinline></video>
+                <canvas id="output_canvas"></canvas>
+                <div id="loading" class="overlay">Lade ML Modelle...</div>
+                <div id="gesture-output" class="translation-box">Bereit...</div>
+            </div>
+            
+            <div class="controls">
+                <button id="webcamButton" class="btn primary" disabled>Kamera aktivieren</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Main Module -->
+    <script type="module" src="src/main.js"></script>
+</body>
+</html>
