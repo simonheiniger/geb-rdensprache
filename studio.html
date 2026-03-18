@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KI Studio - DSGS Übersetzer</title>
+    <link rel="stylesheet" href="src/style.css">
+    <link rel="stylesheet" href="src/style-studio.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- TensorFlow.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>KI Trainings-Studio</h1>
+            <p>Nimm eigene Sätze auf und trainiere dein Neuronales Netz (LSTM) direkt im Browser!</p>
+            <a href="index.html" class="nav-link">← Zurück zur Übersetzer-App</a>
+        </header>
+        
+        <main>
+            <div class="studio-layout">
+                <!-- Video Section -->
+                <div class="video-panel">
+                    <div class="video-container">
+                        <video id="webcam" autoplay playsinline></video>
+                        <canvas id="output_canvas"></canvas>
+                        <div id="loading" class="overlay">Lade ML Modelle...</div>
+                    </div>
+                    <div class="controls mt-4">
+                        <button id="webcamButton" class="btn primary" disabled>Kamera aktivieren</button>
+                    </div>
+                </div>
+
+                <!-- Training Panel -->
+                <div class="training-panel card">
+                    <h2>1. Daten Aufnehmen</h2>
+                    <div class="form-group">
+                        <label for="gesture-label">Welchen Satz möchtest du lernen?</label>
+                        <input type="text" id="gesture-label" placeholder="z.B. Wie geht es dir?" class="input-field">
+                    </div>
+                    
+                    <button id="record-btn" class="btn action is-recording-hide" disabled>
+                        <span>🔴 30 Frames aufzeichnen</span>
+                    </button>
+                    
+                    <div class="stats-box">
+                        <h3>Gesammelte Daten:</h3>
+                        <div id="data-count">0 Aufnahmen gesamt (0 Labels)</div>
+                        <ul id="label-list" class="label-list"></ul>
+                    </div>
+
+                    <hr>
+
+                    <h2>2. KI Trainieren</h2>
+                    <button id="train-btn" class="btn success" disabled>⚡ Training Starten</button>
+                    
+                    <div class="console-box" id="status-text">Warte auf Daten...</div>
+
+                    <hr>
+
+                    <h2>3. Exportieren</h2>
+                    <button id="download-btn" class="btn secondary" disabled>💾 Modell herunterladen</button>
+                    <p class="help-text">Du erhältst 3 Dateien (.json, .bin, labels.json). Verschiebe diese später in deinen Ordner `/models`.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Main Module -->
+    <script type="module" src="src/studio.js"></script>
+</body>
+</html>
