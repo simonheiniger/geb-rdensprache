@@ -77,8 +77,7 @@ function enableCam(event) {
 }
 
 async function predictWebcam() {
-    canvasElement.style.width = video.videoWidth + "px";
-    canvasElement.style.height = video.videoHeight + "px";
+    // Interne Render-Auflösung auf echte Pixel des Kamerabildes setzen
     canvasElement.width = video.videoWidth;
     canvasElement.height = video.videoHeight;
 
